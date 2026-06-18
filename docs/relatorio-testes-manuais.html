@@ -1,0 +1,1981 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Relatório de Testes Manuais — Mundo Real Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --bg-page: #0f1117;
+      --bg-card: #1a1d27;
+      --bg-card2: #20233a;
+      --border: #2a2f4a;
+      --accent: #6c63ff;
+      --accent-light: #8b85ff;
+      --accent-glow: rgba(108, 99, 255, 0.15);
+      --pass: #22c55e;
+      --fail: #ef4444;
+      --block: #f59e0b;
+      --pending: #94a3b8;
+      --text-primary: #e2e8f0;
+      --text-muted: #8892a4;
+      --radius: 12px;
+      --font: 'Inter', 'Segoe UI', system-ui, sans-serif;
+    }
+
+    *,
+    *::before,
+    *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-page);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* ── LIGHTBOX ─────────────────────────────────────────── */
+    #lightbox {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, .85);
+      z-index: 9999;
+      align-items: center;
+      justify-content: center;
+    }
+
+    #lightbox.open {
+      display: flex;
+    }
+
+    #lightbox-img {
+      max-width: 90vw;
+      max-height: 88vh;
+      border-radius: var(--radius);
+      box-shadow: 0 0 60px rgba(108, 99, 255, .4);
+    }
+
+    #lightbox-close {
+      position: absolute;
+      top: 1.2rem;
+      right: 1.5rem;
+      font-size: 1.8rem;
+      cursor: pointer;
+      color: var(--text-primary);
+      line-height: 1;
+      opacity: .7;
+      transition: opacity .2s;
+    }
+
+    #lightbox-close:hover {
+      opacity: 1;
+    }
+
+    /* ── TOPBAR ───────────────────────────────────────────── */
+    .topbar {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .topbar-brand {
+      display: flex;
+      align-items: center;
+      gap: .9rem;
+    }
+
+    .logo-dot {
+      width: 40px;
+      height: 40px;
+      background: var(--accent-glow);
+      border: 1.5px solid var(--accent);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .topbar-brand img {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+    }
+
+    .topbar-brand h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+
+    .topbar-brand span {
+      font-size: .78rem;
+      color: var(--text-muted);
+    }
+
+    .badge-version {
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      padding: .3rem .8rem;
+      border-radius: 20px;
+      font-size: .75rem;
+      font-weight: 600;
+    }
+
+    /* ── HERO ─────────────────────────────────────────────── */
+    .hero {
+      background: linear-gradient(135deg, #14172a 0%, #1a1d35 50%, #0f1117 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 3rem 2rem;
+    }
+
+    .hero-inner {
+      max-width: 960px;
+      margin: 0 auto;
+    }
+
+    .hero-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      padding: .3rem .9rem;
+      border-radius: 20px;
+      font-size: .78rem;
+      font-weight: 600;
+      margin-bottom: 1rem;
+    }
+
+    .hero h2 {
+      font-size: 2rem;
+      font-weight: 800;
+      background: linear-gradient(90deg, #e2e8f0, var(--accent-light));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: .6rem;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: .95rem;
+      margin-bottom: 1.8rem;
+      max-width: 600px;
+    }
+
+    .hero-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.2rem;
+    }
+
+    .hero-meta-item {
+      background: rgba(255, 255, 255, .04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: .5rem 1rem;
+    }
+
+    .hero-meta-item label {
+      display: block;
+      font-size: .7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .hero-meta-item span {
+      font-size: .9rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    /* ── CONTAINER ────────────────────────────────────────── */
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* ── SCOREBOARD ───────────────────────────────────────── */
+    .scoreboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .score-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1rem;
+      text-align: center;
+      transition: transform .2s, box-shadow .2s;
+    }
+
+    .score-card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, .3);
+    }
+
+    .score-card.pass {
+      border-top: 3px solid var(--pass);
+    }
+
+    .score-card.fail {
+      border-top: 3px solid var(--fail);
+    }
+
+    .score-card.block {
+      border-top: 3px solid var(--block);
+    }
+
+    .score-card.total {
+      border-top: 3px solid var(--accent);
+    }
+
+    .score-card.pct {
+      border-top: 3px solid var(--accent-light);
+    }
+
+    .score-icon {
+      font-size: 1.5rem;
+      margin-bottom: .4rem;
+    }
+
+    .score-num {
+      font-size: 2rem;
+      font-weight: 800;
+      color: var(--text-primary);
+      line-height: 1;
+    }
+
+    .score-label {
+      font-size: .72rem;
+      color: var(--text-muted);
+      margin-top: .3rem;
+      text-transform: uppercase;
+      letter-spacing: .04em;
+    }
+
+    /* ── PROGRESS ─────────────────────────────────────────── */
+    .progress-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .progress-section h3 {
+      font-size: .85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      margin-bottom: .8rem;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    .progress-bar-wrap {
+      background: rgba(255, 255, 255, .06);
+      border-radius: 999px;
+      height: 10px;
+      overflow: hidden;
+      margin-bottom: .5rem;
+    }
+
+    .progress-bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--accent), var(--pass));
+      border-radius: 999px;
+      transition: width 1s ease;
+    }
+
+    .progress-labels {
+      display: flex;
+      justify-content: space-between;
+      font-size: .75rem;
+      color: var(--text-muted);
+    }
+
+    /* ── SECTION TITLE ────────────────────────────────────── */
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: .7rem;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: .8rem;
+      margin-bottom: 1rem;
+      margin-top: 2rem;
+    }
+
+    .section-title .icon {
+      width: 32px;
+      height: 32px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1rem;
+    }
+
+    /* ── FLOW BLOCK ───────────────────────────────────────── */
+    .flow-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      margin-bottom: 1rem;
+      overflow: hidden;
+      transition: box-shadow .2s;
+    }
+
+    .flow-block:hover {
+      box-shadow: 0 4px 20px rgba(0, 0, 0, .25);
+    }
+
+    .flow-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.3rem;
+      cursor: pointer;
+      user-select: none;
+      gap: .8rem;
+      transition: background .2s;
+    }
+
+    .flow-header:hover {
+      background: rgba(255, 255, 255, .03);
+    }
+
+    .flow-header-left {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+    }
+
+    .flow-id {
+      background: var(--accent-glow);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      padding: .2rem .6rem;
+      border-radius: 6px;
+      font-size: .75rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .flow-title {
+      font-size: .95rem;
+      font-weight: 600;
+      color: var(--text-primary);
+    }
+
+    .flow-chevron {
+      color: var(--text-muted);
+      font-size: .85rem;
+      transition: transform .3s;
+    }
+
+    .flow-block:not(.open) .flow-chevron {
+      transform: rotate(-90deg);
+    }
+
+    .flow-body {
+      padding: 0 1.3rem 1.3rem;
+      overflow: hidden;
+    }
+
+    .flow-block:not(.open) .flow-body {
+      display: none;
+    }
+
+    /* ── TEST TABLE ───────────────────────────────────────── */
+    .test-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.2rem;
+      font-size: .85rem;
+    }
+
+    .test-table thead tr {
+      background: var(--bg-card2);
+    }
+
+    .test-table th {
+      padding: .6rem .9rem;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .test-table td {
+      padding: .65rem .9rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      color: var(--text-primary);
+      vertical-align: top;
+    }
+
+    .test-table td:first-child {
+      font-weight: 700;
+      color: var(--accent-light);
+      white-space: nowrap;
+    }
+
+    .test-table tbody tr:last-child td {
+      border-bottom: none;
+    }
+
+    .test-table tbody tr:hover {
+      background: rgba(255, 255, 255, .025);
+    }
+
+    /* ── STATUS BADGES ────────────────────────────────────── */
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: .35rem;
+      padding: .25rem .7rem;
+      border-radius: 20px;
+      font-size: .72rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .status.dot::before {
+      content: '';
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .status.pass {
+      background: rgba(34, 197, 94, .12);
+      color: var(--pass);
+    }
+
+    .status.pass.dot::before {
+      background: var(--pass);
+    }
+
+    .status.fail {
+      background: rgba(239, 68, 68, .12);
+      color: var(--fail);
+    }
+
+    .status.fail.dot::before {
+      background: var(--fail);
+    }
+
+    .status.block {
+      background: rgba(245, 158, 11, .12);
+      color: var(--block);
+    }
+
+    .status.block.dot::before {
+      background: var(--block);
+    }
+
+    .status.pending {
+      background: rgba(148, 163, 184, .1);
+      color: var(--pending);
+    }
+
+    .status.pending.dot::before {
+      background: var(--pending);
+    }
+
+    /* ── EVIDENCE ─────────────────────────────────────────── */
+    .evidence-section {
+      margin-top: 1rem;
+    }
+
+    .evidence-section h4 {
+      font-size: .8rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      margin-bottom: .8rem;
+    }
+
+    .evidence-gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: .8rem;
+    }
+
+    .evidence-item {
+      position: relative;
+      cursor: pointer;
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1.5px solid var(--border);
+      transition: border-color .2s, transform .2s;
+      background: var(--bg-card2);
+      width: 130px;
+    }
+
+    .evidence-item:hover {
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    .evidence-item img {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .evidence-caption {
+      font-size: .67rem;
+      padding: .3rem .5rem;
+      color: var(--text-muted);
+      text-align: center;
+    }
+
+    .evidence-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: .5rem;
+      padding: 1.5rem;
+      border: 1.5px dashed var(--border);
+      border-radius: 8px;
+      color: var(--text-muted);
+      font-size: .8rem;
+      width: 100%;
+    }
+
+    .evidence-placeholder span {
+      font-size: 1.5rem;
+    }
+
+    /* ── OBS BOX ──────────────────────────────────────────── */
+    .obs-box {
+      background: var(--bg-card2);
+      border-left: 3px solid var(--accent);
+      border-radius: 0 8px 8px 0;
+      padding: .75rem 1rem;
+      font-size: .82rem;
+      color: var(--text-muted);
+      margin-top: 1rem;
+    }
+
+    .obs-box strong {
+      color: var(--accent-light);
+    }
+
+    /* ── BUG CARD ─────────────────────────────────────────── */
+    .bug-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.2rem;
+      margin-bottom: 1rem;
+    }
+
+    .bug-card.critical {
+      border-left: 4px solid var(--fail);
+    }
+
+    .bug-card.high {
+      border-left: 4px solid #fb923c;
+    }
+
+    .bug-card.medium {
+      border-left: 4px solid var(--block);
+    }
+
+    .bug-card.low {
+      border-left: 4px solid var(--pending);
+    }
+
+    .bug-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: .8rem;
+      gap: 1rem;
+    }
+
+    .bug-id {
+      background: rgba(239, 68, 68, .12);
+      color: var(--fail);
+      padding: .2rem .6rem;
+      border-radius: 6px;
+      font-size: .72rem;
+      font-weight: 700;
+      margin-bottom: .3rem;
+      display: inline-block;
+    }
+
+    .bug-title {
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--text-primary);
+    }
+
+    .severity {
+      padding: .25rem .7rem;
+      border-radius: 20px;
+      font-size: .7rem;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .severity.critical {
+      background: rgba(239, 68, 68, .15);
+      color: var(--fail);
+    }
+
+    .severity.high {
+      background: rgba(251, 146, 60, .15);
+      color: #fb923c;
+    }
+
+    .severity.medium {
+      background: rgba(245, 158, 11, .15);
+      color: var(--block);
+    }
+
+    .severity.low {
+      background: rgba(148, 163, 184, .1);
+      color: var(--pending);
+    }
+
+    .bug-body {
+      display: grid;
+      grid-template-columns: max-content 1fr;
+      gap: .3rem .8rem;
+      font-size: .82rem;
+    }
+
+    .bug-body dt {
+      color: var(--text-muted);
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .bug-body dd {
+      color: var(--text-primary);
+    }
+
+    .no-bugs {
+      display: flex;
+      align-items: center;
+      gap: .8rem;
+      background: var(--bg-card);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      color: var(--text-muted);
+      font-size: .88rem;
+    }
+
+    /* ── MATRIX TABLE ─────────────────────────────────────── */
+    .matrix-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: .84rem;
+    }
+
+    .matrix-table th {
+      background: var(--bg-card2);
+      padding: .7rem 1rem;
+      text-align: left;
+      font-size: .72rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .matrix-table td {
+      padding: .65rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, .04);
+      color: var(--text-primary);
+      background: var(--bg-card);
+    }
+
+    .matrix-table tbody tr:hover td {
+      background: rgba(255, 255, 255, .025);
+    }
+
+    /* ── FOOTER ───────────────────────────────────────────── */
+    .footer {
+      text-align: center;
+      padding: 2rem 1rem;
+      border-top: 1px solid var(--border);
+      color: var(--text-muted);
+      font-size: .8rem;
+      margin-top: 4rem;
+    }
+
+    .footer strong {
+      color: var(--accent-light);
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- LIGHTBOX -->
+  <div id="lightbox">
+    <span id="lightbox-close" onclick="closeLightbox()">&#x2715;</span>
+    <img id="lightbox-img" src="" alt="Evidência ampliada" />
+  </div>
+
+  <!-- TOPBAR -->
+  <header class="topbar">
+    <div class="topbar-brand">
+      <div class="logo-dot">
+        <img src="./evidencias/icon.png" alt="Logo Mundo Real">
+      </div>
+      <div>
+        <h1>Mundo Real — Admin</h1>
+        <span>Relatório de Testes Manuais</span>
+      </div>
+    </div>
+    <div class="topbar-meta">
+      <span class="badge-version">v1.0 — Homologação</span>
+    </div>
+  </header>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="hero-inner">
+      <div class="hero-tag">📋 QA Report — POP-QA-001</div>
+      <h2>Relatório de Testes Manuais</h2>
+      <p>Validação completa do painel administrativo da loja virtual Mundo Real. Cobre autenticação, gestão de produtos,
+        pedidos, clientes, marketing, configurações e o programa de fidelidade Realitos.</p>
+      <div class="hero-meta">
+        <div class="hero-meta-item">
+          <label>Projeto</label>
+          <span>Mundo Real Admin</span>
+        </div>
+        <div class="hero-meta-item">
+          <label>Plataforma</label>
+          <span>🌐 Web (React + Supabase)</span>
+        </div>
+        <div class="hero-meta-item">
+          <label>Executor</label>
+          <span id="meta-executor">—</span>
+        </div>
+        <div class="hero-meta-item">
+          <label>Data</label>
+          <span id="meta-data">—</span>
+        </div>
+        <div class="hero-meta-item">
+          <label>Ambiente</label>
+          <span>Produção / Homologação</span>
+        </div>
+        <div class="hero-meta-item">
+          <label>URL</label>
+          <span>admin.lojasmundoreal.com.br</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <main class="container">
+
+    <!-- SCOREBOARD -->
+    <div class="scoreboard" id="scoreboard">
+      <div class="score-card total">
+        <div class="score-icon">🧪</div>
+        <div class="score-num" id="sc-total">0</div>
+        <div class="score-label">Total de Casos</div>
+      </div>
+      <div class="score-card pass">
+        <div class="score-icon">✅</div>
+        <div class="score-num" id="sc-pass">0</div>
+        <div class="score-label">Aprovados</div>
+      </div>
+      <div class="score-card fail">
+        <div class="score-icon">❌</div>
+        <div class="score-num" id="sc-fail">0</div>
+        <div class="score-label">Reprovados</div>
+      </div>
+      <div class="score-card block">
+        <div class="score-icon">⚠️</div>
+        <div class="score-num" id="sc-block">0</div>
+        <div class="score-label">Bloqueados</div>
+      </div>
+      <div class="score-card pct">
+        <div class="score-icon">📊</div>
+        <div class="score-num" id="sc-pct">—</div>
+        <div class="score-label">Taxa de Aprovação</div>
+      </div>
+    </div>
+
+    <!-- BARRA DE PROGRESSO -->
+    <div class="progress-section">
+      <h3>Progresso geral de aprovação</h3>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-fill" id="progress-bar" style="width: 0%"></div>
+      </div>
+      <div class="progress-labels">
+        <span>0%</span>
+        <span id="progress-pct-label">0%</span>
+      </div>
+    </div>
+
+    <!-- ── FLUXOS ─────────────────────────────────────────── -->
+    <div class="section-title">
+      <div class="icon">🧪</div>
+      Casos de Teste por Fluxo
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-01 ══ -->
+    <div class="flow-block open" id="flow-fl01">
+      <div class="flow-header" onclick="toggleFlow('flow-fl01')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-01</span>
+          <span class="flow-title">Autenticação — Login e Acesso ao Painel</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-01</td>
+              <td>Login com credenciais válidas de administrador</td>
+              <td>Acessar <code>admin.lojasmundoreal.com.br/login</code> sem estar autenticado</td>
+              <td>Redireciona para o Dashboard após login. KPIs e gráficos carregam corretamente.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-02</td>
+              <td>Login com senha incorreta</td>
+              <td>Estar na tela de login com e-mail válido</td>
+              <td>Exibe mensagem de erro de autenticação. Usuário permanece na tela de login.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-03</td>
+              <td>Tentativa de acesso à rota protegida sem autenticação</td>
+              <td>Usuário não logado tenta acessar <code>/produtos</code> diretamente</td>
+              <td>Redirecionamento automático para <code>/login</code>.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-04</td>
+              <td>Logout do sistema</td>
+              <td>Usuário autenticado como admin</td>
+              <td>Sessão encerrada. Redirecionado para <code>/login</code>. Rotas protegidas inacessíveis.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-01 / TC-02 / TC-03 / TC-04 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl01">
+            <div class="evidence-item" onclick="openLightbox('evidencias/01_login_page_desktop.png')">
+              <img src="evidencias/01_login_page_desktop.png" alt="Tela de Login — Desktop" />
+              <div class="evidence-caption">TC-01 · Login (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/02_dashboard_desktop.png')">
+              <img src="evidencias/02_dashboard_desktop.png" alt="Dashboard após login — Desktop" />
+              <div class="evidence-caption">TC-01 · Dashboard (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/01_login_page_mobile.png')">
+              <img src="evidencias/01_login_page_mobile.png" alt="Tela de Login — Mobile" />
+              <div class="evidence-caption">TC-01 · Login (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/02_dashboard_mobile.png')">
+              <img src="evidencias/02_dashboard_mobile.png" alt="Dashboard após login — Mobile" />
+              <div class="evidence-caption">TC-01 · Dashboard (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc02-login-erro.png')">
+              <img src="evidencias/tc02-login-erro.png" alt="Mensagem de erro de login com senha incorreta" />
+              <div class="evidence-caption">TC-02 · Erro Login</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc03-rota-protegida.png')">
+              <img src="evidencias/tc03-rota-protegida.png"
+                alt="Redirecionamento automático ao acessar rota protegida" />
+              <div class="evidence-caption">TC-03 · Rota Protegida</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc04-logout.png')">
+              <img src="evidencias/tc04-logout.png" alt="Menu do usuário com opção de Sair" />
+              <div class="evidence-caption">TC-04 · Menu Sair</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-01 ✅ Aprovado:</strong> Login com credenciais válidas de administrador
+          funcionando corretamente. <strong>TC-02 ✅ Aprovado:</strong> Tentativa de login com senha incorreta exibe
+          corretamente a mensagem de erro "Email ou senha inválidos". <strong>TC-03 ✅ Aprovado:</strong> Tentativa de
+          acessar a rota protegida <code>/produtos</code> sem estar autenticado redireciona automaticamente para a tela
+          de login. <strong>TC-04 ✅ Aprovado:</strong> O botão "Sair" encerra a sessão corretamente e redireciona o
+          usuário para a tela de login.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-02 ══ -->
+    <div class="flow-block open" id="flow-fl02">
+      <div class="flow-header" onclick="toggleFlow('flow-fl02')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-02</span>
+          <span class="flow-title">Dashboard — Visão Geral da Loja</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-05</td>
+              <td>Verificar exibição dos 4 cards de KPIs</td>
+              <td>Usuário admin autenticado na tela de Dashboard</td>
+              <td>Os 4 cards exibem: Total de Vendas, Novos Clientes, Pedidos Pendentes e Baixo Estoque com valores
+                numéricos.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-06</td>
+              <td>Verificar gráfico de Vendas Mensais (últimos 6 meses)</td>
+              <td>Usuário admin autenticado na tela de Dashboard</td>
+              <td>Gráfico de barras renderiza com os meses corretos. Tooltip exibe valores ao passar o mouse.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-07</td>
+              <td>Verificar lista de Últimos Pedidos e Produtos Recentes</td>
+              <td>Haver ao menos 1 pedido e 1 produto cadastrados no banco</td>
+              <td>Ambos os painéis exibem os itens com nome, valor/estoque e status corretos.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-05 / TC-06 / TC-07 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl02">
+            <div class="evidence-item" onclick="openLightbox('evidencias/02_dashboard_desktop.png')">
+              <img src="evidencias/02_dashboard_desktop.png" alt="Dashboard — Desktop" />
+              <div class="evidence-caption">TC-05/06 · Dashboard (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/02_dashboard_mobile.png')">
+              <img src="evidencias/02_dashboard_mobile.png" alt="Dashboard — Mobile" />
+              <div class="evidence-caption">TC-05/06 · Dashboard (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc07-dashboard-listas.png')">
+              <img src="evidencias/tc07-dashboard-listas.png" alt="Últimos Pedidos e Produtos Recentes no Dashboard" />
+              <div class="evidence-caption">TC-07 · Listas Dashboard</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-05 ✅ Aprovado:</strong> Os 4 cards de KPIs (Total de Vendas, Novos Clientes,
+          Pedidos Pendentes, Baixo Estoque) são exibidos corretamente. <strong>TC-06 ✅ Aprovado:</strong> Gráfico de
+          Vendas Mensais renderizado com tooltip funcional. <strong>TC-07 ✅ Aprovado:</strong> Painéis de "Últimos
+          Pedidos" e "Produtos Recentes" exibem corretamente as listagens com as informações e status atualizados em
+          tempo real.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-03 ══ -->
+    <div class="flow-block open" id="flow-fl03">
+      <div class="flow-header" onclick="toggleFlow('flow-fl03')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-03</span>
+          <span class="flow-title">Produtos — Gerenciamento do Catálogo</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-08</td>
+              <td>Listar produtos e usar a busca por nome</td>
+              <td>Haver produtos cadastrados; usuário na tela Produtos</td>
+              <td>Lista exibe todos os produtos. Ao digitar na busca, a tabela filtra em tempo real pelo nome.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-09</td>
+              <td>Criar novo produto com todos os campos obrigatórios</td>
+              <td>Usuário clica em "Novo Produto"; formulário aberto</td>
+              <td>Produto salvo com sucesso. Aparece na listagem. Toast de confirmação exibido.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-10</td>
+              <td>Validar campos obrigatórios no formulário de produto</td>
+              <td>Formulário de produto aberto; campos Nome, Preço e Estoque em branco</td>
+              <td>Ao submeter sem campos obrigatórios, mensagens de erro de validação são exibidas abaixo de cada campo.
+              </td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-11</td>
+              <td>Editar produto existente (nome e preço)</td>
+              <td>Produto cadastrado; clicar no ícone de lápis</td>
+              <td>Formulário carrega com dados existentes. Após edição e salvar, alterações refletem na listagem.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-12</td>
+              <td>Ativar/desativar produto (toggle status)</td>
+              <td>Produto ativo cadastrado; estar na tela de edição</td>
+              <td>Ao desativar e salvar, produto não aparece mais na loja. Ao reativar, fica disponível novamente.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-13</td>
+              <td>Excluir produto com confirmação</td>
+              <td>Produto cadastrado; clicar no ícone de lixeira</td>
+              <td>Modal de confirmação exibido. Ao confirmar, produto removido da listagem. Ação irreversível.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-08 / TC-09 / TC-10 / TC-11 / TC-12 / TC-13 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl03">
+            <div class="evidence-item" onclick="openLightbox('evidencias/07_produtos_lista_desktop.png')">
+              <img src="evidencias/07_produtos_lista_desktop.png" alt="Lista de Produtos — Desktop" />
+              <div class="evidence-caption">TC-08 · Lista Produtos (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/07_produtos_lista_mobile.png')">
+              <img src="evidencias/07_produtos_lista_mobile.png" alt="Lista de Produtos — Mobile" />
+              <div class="evidence-caption">TC-08 · Lista Produtos (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/06_produto_form_preenchido_desktop.png')">
+              <img src="evidencias/06_produto_form_preenchido_desktop.png" alt="Formulário Produto — Desktop" />
+              <div class="evidence-caption">TC-09 · Form Produto (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/06_produto_form_preenchido_mobile.png')">
+              <img src="evidencias/06_produto_form_preenchido_mobile.png" alt="Formulário Produto — Mobile" />
+              <div class="evidence-caption">TC-09 · Form Produto (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc10-produto-validacao.png')">
+              <img src="evidencias/tc10-produto-validacao.png"
+                alt="Botão Salvar desabilitado e campo de nome com alerta" />
+              <div class="evidence-caption">TC-10 · Validação Produto</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc11-produto-edicao.png')">
+              <img src="evidencias/tc11-produto-edicao.png"
+                alt="Formulário de produto carregado com dados para edição" />
+              <div class="evidence-caption">TC-11 · Edição Produto</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc12-produto-status.png')">
+              <img src="evidencias/tc12-produto-status.png" alt="Inativação de produto através do toggle de status" />
+              <div class="evidence-caption">TC-12 · Desativar Prod.</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc13-produto-exclusao.png')">
+              <img src="evidencias/tc13-produto-exclusao.png" alt="Modal de confirmação ao tentar excluir o produto" />
+              <div class="evidence-caption">TC-13 · Excluir Produto</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-08 ✅ Aprovado:</strong> Listagem de produtos carregou corretamente.
+          <strong>TC-09 ✅ Aprovado:</strong> Formulário de criação de produto preenchido e salvo com sucesso — produto
+          aparece na listagem. <strong>TC-10 ✅ Aprovado:</strong> Validação de campos obrigatórios funcional: o botão de
+          salvar permanece desabilitado e o campo de nome do produto é destacado em vermelho enquanto estiver em branco.
+          <strong>TC-11 ✅ Aprovado:</strong> Formulário de edição carrega com os dados prévios corretos do produto
+          cadastrado (Nome, SKU, Marca, etc.). <strong>TC-12 ✅ Aprovado:</strong> Alteração de status (ativo/inativo)
+          funcional. Ao desativar o produto "Raquete", ele deixou de ser retornado nas buscas e exibição do app.
+          <strong>TC-13 ✅ Aprovado:</strong> A exclusão de produtos exibe corretamente o modal de confirmação de
+          segurança contendo o nome do item a ser apagado ("Raquete") e o alerta de ação irreversível.
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-04 ══ -->
+    <div class="flow-block open" id="flow-fl04">
+      <div class="flow-header" onclick="toggleFlow('flow-fl04')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-04</span>
+          <span class="flow-title">Categorias — Organização do Catálogo</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-14</td>
+              <td>Criar nova categoria</td>
+              <td>Tela de Categorias aberta; clicar em "Nova Categoria"</td>
+              <td>Categoria criada e exibida na lista. Toast de sucesso confirmado.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-15</td>
+              <td>Editar nome de categoria existente</td>
+              <td>Categoria cadastrada; clicar no ícone de lápis</td>
+              <td>Nome atualizado e refletido na listagem imediatamente.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-16</td>
+              <td>Excluir categoria com confirmação</td>
+              <td>Categoria existente; clicar no ícone de lixeira</td>
+              <td>Diálogo de confirmação exibido. Categoria removida após confirmação.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-14 / TC-15 / TC-16 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl04">
+            <div class="evidence-item" onclick="openLightbox('evidencias/03_categorias_lista_desktop.png')">
+              <img src="evidencias/03_categorias_lista_desktop.png" alt="Lista de Categorias — Desktop" />
+              <div class="evidence-caption">TC-14 · Lista Categ. (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/04_categorias_modal_novo_desktop.png')">
+              <img src="evidencias/04_categorias_modal_novo_desktop.png" alt="Modal Nova Categoria — Desktop" />
+              <div class="evidence-caption">TC-14 · Modal Nova Categ.</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/05_categorias_lista_atualizada_desktop.png')">
+              <img src="evidencias/05_categorias_lista_atualizada_desktop.png" alt="Lista Atualizada — Desktop" />
+              <div class="evidence-caption">TC-15 · Lista Atualizada</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/03_categorias_lista_mobile.png')">
+              <img src="evidencias/03_categorias_lista_mobile.png" alt="Lista de Categorias — Mobile" />
+              <div class="evidence-caption">TC-14 · Lista Categ. (Mobile)</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-14 ✅ Aprovado:</strong> Nova categoria criada e exibida na lista com sucesso.
+          <strong>TC-15 ✅ Aprovado:</strong> Edição de nome de categoria refletida imediatamente na listagem.
+          <strong>TC-16 ✅ Aprovado:</strong> Exclusão de categorias com confirmação realizada com sucesso (exclusão de
+          categorias existentes e criação de novas testada e validada pelo cliente).
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-05 ══ -->
+    <div class="flow-block open" id="flow-fl05">
+      <div class="flow-header" onclick="toggleFlow('flow-fl05')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-05</span>
+          <span class="flow-title">Pedidos — Acompanhamento e Gestão de Vendas</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-17</td>
+              <td>Listar pedidos e filtrar por status "Pendente"</td>
+              <td>Haver pedidos cadastrados com status variados</td>
+              <td>Filtro de status exibe somente os pedidos com status "Pendente".</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-18</td>
+              <td>Visualizar detalhes completos de um pedido</td>
+              <td>Pedido cadastrado; clicar no ícone de olho</td>
+              <td>Modal/painel exibe: dados do cliente, endereço, itens comprados, subtotal, frete, total e forma de
+                pagamento.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-19</td>
+              <td>Atualizar status do pedido (Pendente → Pago)</td>
+              <td>Pedido com status "Pendente" aberto no detalhe</td>
+              <td>Status alterado e salvo. Listagem de pedidos reflete a mudança imediatamente.</td>
+              <td><span class="status fail dot">Reprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-20</td>
+              <td>Adicionar código de rastreamento ao pedido</td>
+              <td>Pedido com status "Enviado" aberto; campo de rastreamento disponível</td>
+              <td>Código salvo com sucesso e exibido no detalhe do pedido.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-21</td>
+              <td>Liberar Realitos após pedido entregue</td>
+              <td>Pedido marcado como "Entregue"; seção Realitos visível no detalhe</td>
+              <td>Botão "Liberar Realitos" disponível. Ao clicar, pontos são creditados na conta do cliente (visível na
+                tela de Clientes).</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-17 / TC-18 / TC-19 (Reprovado) / TC-20 / TC-21</h4>
+          <div class="evidence-gallery" id="gallery-fl05">
+            <div class="evidence-item" onclick="openLightbox('evidencias/08_pedidos_busca_transportadora_desktop.png')">
+              <img src="evidencias/08_pedidos_busca_transportadora_desktop.png"
+                alt="Pedidos Transportadora — Desktop" />
+              <div class="evidence-caption">TC-17 · Busca Transportadora</div>
+            </div>
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/09_pedidos_detalhes_transportadora_desktop.png')">
+              <img src="evidencias/09_pedidos_detalhes_transportadora_desktop.png" alt="Detalhes Pedido — Desktop" />
+              <div class="evidence-caption">TC-18 · Detalhes Pedido</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc19-pedido-pendente.png')">
+              <img src="evidencias/tc19-pedido-pendente.png" alt="Pedido Pendente na Listagem" />
+              <div class="evidence-caption">TC-19 · Pedido Pendente</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc19-pedido-pagando.png')">
+              <img src="evidencias/tc19-pedido-pagando.png" alt="Alterando status para Pago no modal" />
+              <div class="evidence-caption">TC-19 · Alterando Status</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc19-pedido-pago.png')">
+              <img src="evidencias/tc19-pedido-pago.png" alt="Pedido com status Pago na lista pós refresh" />
+              <div class="evidence-caption">TC-19 · Status Pago (Refresh)</div>
+            </div>
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/10_pedidos_detalhes_transportadora_envio_desktop.png')">
+              <img src="evidencias/10_pedidos_detalhes_transportadora_envio_desktop.png"
+                alt="Código Rastreamento — Desktop" />
+              <div class="evidence-caption">TC-20 · Cód. Rastreamento</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/11_pedidos_busca_retirada_desktop.png')">
+              <img src="evidencias/11_pedidos_busca_retirada_desktop.png" alt="Pedidos Retirada — Desktop" />
+              <div class="evidence-caption">TC-17 · Busca Retirada</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/12_pedidos_detalhes_retirada_desktop.png')">
+              <img src="evidencias/12_pedidos_detalhes_retirada_desktop.png" alt="Detalhes Retirada — Desktop" />
+              <div class="evidence-caption">TC-18 · Detalhes Retirada</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/08_pedidos_busca_transportadora_mobile.png')">
+              <img src="evidencias/08_pedidos_busca_transportadora_mobile.png" alt="Pedidos — Mobile" />
+              <div class="evidence-caption">TC-17 · Pedidos (Mobile)</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-17 ✅ Aprovado:</strong> Busca de pedidos por transportadora e retirada
+          funcionando. <strong>TC-18 ✅ Aprovado:</strong> Detalhes completos exibidos (cliente, endereço, itens,
+          valores, forma de pagamento). <strong>TC-19 ❌ Reprovado:</strong> Ao atualizar o status do pedido para "Pago"
+          no modal, a tela principal de listagem não atualiza o status em tempo real e nenhuma mensagem/toast de
+          confirmação de sucesso é exibida. O status só atualiza após dar refresh F5 manual na tela. <strong>TC-20 ✅
+            Aprovado:</strong> Campo de rastreamento visível e funcional. <strong>TC-21 ✅ Aprovado:</strong> Seção
+          Realitos disponível no detalhe do pedido.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-06 ══ -->
+    <div class="flow-block open" id="flow-fl06">
+      <div class="flow-header" onclick="toggleFlow('flow-fl06')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-06</span>
+          <span class="flow-title">Clientes — Gestão e Saldo de Realitos</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-22</td>
+              <td>Listar clientes e visualizar dados básicos</td>
+              <td>Haver clientes cadastrados; usuário na tela Clientes</td>
+              <td>Tabela exibe nome, e-mail, data de cadastro, saldo Realitos e status de cada cliente.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-23</td>
+              <td>Visualizar detalhes do cliente (endereços e histórico Realitos)</td>
+              <td>Cliente cadastrado; clicar no ícone de olho</td>
+              <td>Modal exibe perfil completo: dados, endereços salvos e extrato completo de transações Realitos
+                (créditos e débitos).</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-24</td>
+              <td>Ativar/desativar conta de cliente</td>
+              <td>Detalhe do cliente aberto; status ativo</td>
+              <td>Toggle desativa a conta. Cliente impedido de fazer login. Ao reativar, acesso restaurado.</td>
+              <td><span class="status fail dot">Reprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-25</td>
+              <td>Ajuste manual de saldo Realitos (crédito e débito)</td>
+              <td>Detalhe do cliente aberto; clicar em "Ajustar Saldo"</td>
+              <td>Formulário de ajuste exibido. Ao confirmar crédito/débito com motivo, saldo atualizado e nova entrada
+                aparece no histórico.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-22 / TC-23 / TC-25 (Aprovados) / TC-24 (Reprovado)</h4>
+          <div class="evidence-gallery" id="gallery-fl06">
+            <div class="evidence-item" onclick="openLightbox('evidencias/14_clientes_desktop.png')">
+              <img src="evidencias/14_clientes_desktop.png" alt="Lista de Clientes — Desktop" />
+              <div class="evidence-caption">TC-22 · Clientes (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/14_clientes_mobile.png')">
+              <img src="evidencias/14_clientes_mobile.png" alt="Lista de Clientes — Mobile" />
+              <div class="evidence-caption">TC-22 · Clientes (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc23-cliente-detalhes.png')">
+              <img src="evidencias/tc23-cliente-detalhes.png" alt="Modal com detalhes do cliente e endereços" />
+              <div class="evidence-caption">TC-23 · Detalhes Cliente</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc24-cliente-status-bug.png')">
+              <img src="evidencias/tc24-cliente-status-bug.png"
+                alt="Toggle de status do cliente não atualiza no banco de dados" />
+              <div class="evidence-caption">TC-24 · Bug Status Conta</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc25-realitos-ajuste-admin.png')">
+              <img src="evidencias/tc25-realitos-ajuste-admin.png" alt="Ajuste manual de Realitos no Painel Admin" />
+              <div class="evidence-caption">TC-25 · Ajuste Admin</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc25-realitos-ajuste-app.png')">
+              <img src="evidencias/tc25-realitos-ajuste-app.png"
+                alt="Saldo de Realitos atualizado no app mobile do cliente" />
+              <div class="evidence-caption">TC-25 · Saldo no App</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-22 ✅ Aprovado:</strong> Lista de clientes carregou com nome, e-mail, saldo
+          Realitos e status exibidos corretamente. <strong>TC-23 ✅ Aprovado:</strong> Modal de detalhes do cliente exibe
+          de forma correta e completa todas as informações cadastradas (Nome, E-mail, Data de Cadastro, Telefone,
+          Endereços Salvos e extrato Realitos). <strong>TC-24 ❌ Reprovado:</strong> Bug encontrado no toggle de status
+          da conta do cliente. Ao clicar para ativar/desativar, o sistema exibe toast de "Status atualizado com
+          sucesso", porém o toggle não muda visualmente e a alteração não é persistida no Supabase (coluna
+          <code>is_active</code> permanece <code>true</code> na tabela <code>profiles</code>). <strong>TC-25 ✅
+            Aprovado:</strong> O ajuste manual de saldo de Realitos (crédito/débito) funciona com sucesso. A alteração
+          de saldo é aplicada no modal admin e reflete em tempo real no app mobile do usuário (Minhas moedas).
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-07 ══ -->
+    <div class="flow-block open" id="flow-fl07">
+      <div class="flow-header" onclick="toggleFlow('flow-fl07')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-07</span>
+          <span class="flow-title">Banners — Gerenciamento de Marketing</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-26</td>
+              <td>Criar novo banner com imagem e link de destino</td>
+              <td>Tela de Banners aberta; clicar em "Novo Banner"</td>
+              <td>Banner criado e exibido na listagem com prévia da imagem, título e status Ativo.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-27</td>
+              <td>Ativar/desativar banner via toggle</td>
+              <td>Banner ativo cadastrado na listagem</td>
+              <td>Toggle alterna o status de Ativo para Inativo e vice-versa. Mudança refletida imediatamente.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-28</td>
+              <td>Excluir banner com confirmação</td>
+              <td>Banner cadastrado; clicar no ícone de lixeira</td>
+              <td>Diálogo de confirmação exibido. Banner removido permanentemente após confirmação.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-26 / TC-27 / TC-28 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl07">
+            <div class="evidence-item" onclick="openLightbox('evidencias/15_marketing_banners_desktop.png')">
+              <img src="evidencias/15_marketing_banners_desktop.png" alt="Banners — Desktop" />
+              <div class="evidence-caption">TC-26 · Banners (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/15_marketing_banners_mobile.png')">
+              <img src="evidencias/15_marketing_banners_mobile.png" alt="Banners — Mobile" />
+              <div class="evidence-caption">TC-26 · Banners (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc27-banner-toggle.png')">
+              <img src="evidencias/tc27-banner-toggle.png"
+                alt="Inativação de banner via toggle de status no painel admin" />
+              <div class="evidence-caption">TC-27 · Toggle Banner</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc28-banner-exclusao.png')">
+              <img src="evidencias/tc28-banner-exclusao.png" alt="Modal de confirmação de exclusão do banner" />
+              <div class="evidence-caption">TC-28 · Excluir Banner</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-26 ✅ Aprovado:</strong> Tela de Banners carregada, listagem com prévia de imagem
+          e status exibidos corretamente. <strong>TC-27 ✅ Aprovado:</strong> O toggle de ativar/desativar banner
+          funciona corretamente. Ao inativar o banner "Teste 2" no admin, o mesmo deixou de ser renderizado no
+          aplicativo em tempo real. <strong>TC-28 ✅ Aprovado:</strong> A exclusão de banners com confirmação funciona
+          corretamente. O modal é exibido de forma adequada para o banner "Tecnologia" e, após a confirmação de
+          exclusão, o banner é removido e deixa de ser exibido no aplicativo do cliente em tempo real.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-08 ══ -->
+    <div class="flow-block open" id="flow-fl08">
+      <div class="flow-header" onclick="toggleFlow('flow-fl08')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-08</span>
+          <span class="flow-title">Cupons de Desconto</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-29</td>
+              <td>Criar cupom de desconto percentual com data de expiração</td>
+              <td>Tela de Cupons aberta; preencher formulário de criação</td>
+              <td>Cupom salvo e exibido na tabela com código, tipo "Percentual", valor, expiração e status Ativo.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-30</td>
+              <td>Criar cupom de desconto de valor fixo (R$) com limite de uso</td>
+              <td>Tela de Cupons aberta; preencher formulário de criação</td>
+              <td>Cupom salvo corretamente. Coluna "Uso" exibe "0 / [limite]".</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-31</td>
+              <td>Verificar exibição de informações na tabela de cupons</td>
+              <td>Haver cupons cadastrados</td>
+              <td>Tabela exibe: Código, Tipo, Valor, Expiração, Contagem de Uso e Status de cada cupom.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-29 / TC-30 / TC-31 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl08">
+            <div class="evidence-item" onclick="openLightbox('evidencias/16_marketing_cupons_desktop.png')">
+              <img src="evidencias/16_marketing_cupons_desktop.png" alt="Cupons — Desktop" />
+              <div class="evidence-caption">TC-31 · Cupons (Desktop)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/16_marketing_cupons_mobile.png')">
+              <img src="evidencias/16_marketing_cupons_mobile.png" alt="Cupons — Mobile" />
+              <div class="evidence-caption">TC-31 · Cupons (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc29-cupom-criar.png')">
+              <img src="evidencias/tc29-cupom-criar.png" alt="Formulário de criação de cupom com sucesso" />
+              <div class="evidence-caption">TC-29 · Criar Cupom</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc29-cupom-lista.png')">
+              <img src="evidencias/tc29-cupom-lista.png" alt="Tabela de cupons cadastrados exibindo cupom criado" />
+              <div class="evidence-caption">TC-29 · Cupom Criado</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc30-cupom-limite.png')">
+              <img src="evidencias/tc30-cupom-limite.png" alt="Exibição de limite de uso de cupom na listagem" />
+              <div class="evidence-caption">TC-30 · Limite Cupom</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-29 ✅ Aprovado:</strong> O formulário de criação de cupom percentual com limite e
+          data de expiração funciona com sucesso, inserindo o cupom e exibindo-o na tabela de cadastrados. <strong>TC-30
+            ✅ Aprovado:</strong> Criação de cupom com limite de uso implementada corretamente. A coluna "Uso" na
+          listagem exibe a contagem no formato <code>0 / [limite]</code> conforme esperado. <strong>TC-31 ✅
+            Aprovado:</strong> Tabela de cupons exibe Código, Tipo, Valor, Expiração, Uso e Status corretamente.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-09 ══ -->
+    <div class="flow-block open" id="flow-fl09">
+      <div class="flow-header" onclick="toggleFlow('flow-fl09')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-09</span>
+          <span class="flow-title">Configurações — Regras de Entrega</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-32</td>
+              <td>Verificar opção de Retirada na Loja ativa por padrão</td>
+              <td>Tela de Configurações aberta na seção de entrega</td>
+              <td>Seção "Retirada na Loja" exibida como ativa (sem configuração adicional necessária).</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-33</td>
+              <td>Adicionar nova Zona de Entrega Local com faixa de CEP e valor fixo</td>
+              <td>Tela de Configurações aberta; formulário de Zona Local preenchido</td>
+              <td>Zona salva e exibida na tabela com nome, faixa de CEP, valor e prazo. Nova zona ativa para cálculo de
+                frete na loja.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-34</td>
+              <td>Adicionar Região de Transportadora com regra de frete grátis</td>
+              <td>Tela de Configurações aberta; formulário de Região preenchido</td>
+              <td>Região salva e exibida com nome, prazo e valor mínimo para frete grátis.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-32 / TC-33 / TC-34 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl09">
+            <div class="evidence-item" onclick="openLightbox('evidencias/17_configuracoes_desktop.png')">
+              <img src="evidencias/17_configuracoes_desktop.png" alt="Configurações — Desktop" />
+              <div class="evidence-caption">TC-32 · Config. Entrega (Desktop)</div>
+            </div>
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/17_configuracoes_formulario_local_desktop.png')">
+              <img src="evidencias/17_configuracoes_formulario_local_desktop.png" alt="Form Zona Local — Desktop" />
+              <div class="evidence-caption">TC-33 · Form Zona Local</div>
+            </div>
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/18_configuracoes_zona_adicionada_desktop.png')">
+              <img src="evidencias/18_configuracoes_zona_adicionada_desktop.png" alt="Zona Adicionada — Desktop" />
+              <div class="evidence-caption">TC-33 · Zona Adicionada</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/17_configuracoes_mobile.png')">
+              <img src="evidencias/17_configuracoes_mobile.png" alt="Configurações — Mobile" />
+              <div class="evidence-caption">TC-32 · Config. (Mobile)</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc34-regiao-criar.png')">
+              <img src="evidencias/tc34-regiao-criar.png" alt="Formulário de criação de nova região de entrega" />
+              <div class="evidence-caption">TC-34 · Criar Região</div>
+            </div>
+            <div class="evidence-item" onclick="openLightbox('evidencias/tc34-regiao-lista.png')">
+              <img src="evidencias/tc34-regiao-lista.png" alt="Tabela com nova região de transportadora cadastrada" />
+              <div class="evidence-caption">TC-34 · Região Criada</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-32 ✅ Aprovado:</strong> Retirada na loja exibida como ativa na tela de
+          configurações. <strong>TC-33 ✅ Aprovado:</strong> Nova zona de entrega local criada e exibida na tabela com
+          CEP, valor e prazo. <strong>TC-34 ✅ Aprovado:</strong> Criação de região de transportadora com regra de frete
+          grátis funcional, exibindo corretamente o nome, prazo estimado de entrega (em dias úteis) e o valor de
+          ativação do frete grátis na tabela.</div>
+      </div>
+    </div>
+
+    <!-- ═══════════════════════════════════ FL-10 ══ -->
+    <div class="flow-block open" id="flow-fl10">
+      <div class="flow-header" onclick="toggleFlow('flow-fl10')">
+        <div class="flow-header-left">
+          <span class="flow-id">FL-10</span>
+          <span class="flow-title">Sistema Realitos — Programa de Fidelidade</span>
+        </div>
+        <span class="flow-chevron">▼</span>
+      </div>
+      <div class="flow-body">
+        <table class="test-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Caso de Teste</th>
+              <th>Pré-condição</th>
+              <th>Resultado Esperado</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>TC-35</td>
+              <td>Visualizar configurações atuais do Realitos</td>
+              <td>Tela de Configurações aberta na seção Realitos</td>
+              <td>Campos exibidos: Valor Base de Compra, Realitos Ganhos, Valor do Realito e Pedido Mínimo para Uso —
+                com os valores corretos do banco.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+            <tr>
+              <td>TC-36</td>
+              <td>Alterar regras do Realitos e salvar</td>
+              <td>Seção Realitos aberta; editar valores dos campos</td>
+              <td>Ao clicar em "Salvar Regras do Realitos", as novas regras são persistidas. Toast de confirmação
+                exibido. Valores recarregados refletem a alteração.</td>
+              <td><span class="status pass dot">Aprovado</span></td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="evidence-section">
+          <h4>📸 Evidências Visuais — TC-35 / TC-36 (Aprovados)</h4>
+          <div class="evidence-gallery" id="gallery-fl10">
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/19_configuracoes_realitos_alterado_desktop.png')">
+              <img src="evidencias/19_configuracoes_realitos_alterado_desktop.png" alt="Realitos Alterado — Desktop" />
+              <div class="evidence-caption">TC-36 · Realitos Salvo (Desktop)</div>
+            </div>
+            <div class="evidence-item"
+              onclick="openLightbox('evidencias/19_configuracoes_realitos_alterado_mobile.png')">
+              <img src="evidencias/19_configuracoes_realitos_alterado_mobile.png" alt="Realitos Alterado — Mobile" />
+              <div class="evidence-caption">TC-36 · Realitos Salvo (Mobile)</div>
+            </div>
+          </div>
+        </div>
+        <div class="obs-box"><strong>TC-35 ✅ Aprovado:</strong> Configurações do Realitos exibidas corretamente (Valor
+          Base, Realitos Ganhos, Valor do Realito, Pedido Mínimo). <strong>TC-36 ✅ Aprovado:</strong> Novas regras
+          salvas com sucesso — valores persistidos e refletidos após recarregamento.</div>
+      </div>
+    </div>
+
+    <!-- ── LOG DE BUGS ───────────────────────────────────────── -->
+    <div class="section-title" style="margin-top:2.5rem;">
+      <div class="icon">🐛</div>
+      Log de Bugs
+    </div>
+
+    <div class="bug-card low">
+      <div class="bug-header">
+        <div>
+          <span class="bug-id">BG-01</span>
+          <div class="bug-title">A listagem de pedidos e confirmação de sucesso não atualizam ao marcar status como
+            "Pago" no modal</div>
+        </div>
+        <span class="severity low">BAIXO</span>
+      </div>
+      <div class="bug-body">
+        <dt>Fluxo:</dt>
+        <dd>FL-05 — Pedidos (TC-19)</dd>
+        <dt>Passos para Reproduzir:</dt>
+        <dd>1. Acessar a tela de Pedidos.<br>2. Clicar no ícone de visualização (olho) do pedido.<br>3. No modal de
+          detalhes, alterar o status do pedido para "Pago".<br>4. Fechar o modal ou salvar.</dd>
+        <dt>Comportamento Esperado:</dt>
+        <dd>Exibição de toast/mensagem de sucesso indicando a alteração de status e atualização em tempo real do badge
+          de status na listagem de pedidos para "Pago".</dd>
+        <dt>Comportamento Obtido:</dt>
+        <dd>Nenhum toast/mensagem de sucesso é exibida e o badge de status na listagem de pedidos permanece como
+          "Pendente" até que a página seja recarregada manualmente (F5) no navegador.</dd>
+      </div>
+    </div>
+
+    <div class="bug-card high">
+      <div class="bug-header">
+        <div>
+          <span class="bug-id">BG-02</span>
+          <div class="bug-title">Toggle de status da conta de cliente não atualiza e não persiste alteração no banco de
+            dados (profiles)</div>
+        </div>
+        <span class="severity high">ALTO</span>
+      </div>
+      <div class="bug-body">
+        <dt>Fluxo:</dt>
+        <dd>FL-06 — Clientes (TC-24)</dd>
+        <dt>Passos para Reproduzir:</dt>
+        <dd>1. Acessar a tela de Clientes.<br>2. Clicar no ícone de visualização (olho) de um cliente.<br>3. No modal de
+          detalhes, clicar no toggle de status da conta para desativá-la.<br>4. Verificar se o toggle muda de posição e
+          se o banco de dados é alterado.</dd>
+        <dt>Comportamento Esperado:</dt>
+        <dd>O toggle de status deve mudar de posição de ativo (true) para inativo (false), e enviar a alteração
+          persistindo-a na tabela <code>profiles</code> do Supabase.</dd>
+        <dt>Comportamento Obtido:</dt>
+        <dd>A mensagem de toast de sucesso "Status atualizado / O status do cliente foi atualizado com sucesso" é
+          exibida, porém o toggle não muda de posição (continua ativo) e a alteração não é persistida no banco
+          (Supabase), mantendo a coluna <code>is_active</code> como <code>true</code>.</dd>
+      </div>
+    </div>
+
+    <!-- ── MATRIZ DE COBERTURA ─────────────────────────────── -->
+    <div class="section-title" style="margin-top:2.5rem;">
+      <div class="icon">📊</div>
+      Matriz de Cobertura
+    </div>
+
+    <table class="matrix-table">
+      <thead>
+        <tr>
+          <th>Fluxo</th>
+          <th>Total TCs</th>
+          <th>Aprovados</th>
+          <th>Reprovados</th>
+          <th>Bloqueados</th>
+          <th>Taxa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>FL-01 — Autenticação</td>
+          <td>4</td>
+          <td id="m-fl01-p">—</td>
+          <td id="m-fl01-f">—</td>
+          <td id="m-fl01-b">—</td>
+          <td id="m-fl01-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-02 — Dashboard</td>
+          <td>3</td>
+          <td id="m-fl02-p">—</td>
+          <td id="m-fl02-f">—</td>
+          <td id="m-fl02-b">—</td>
+          <td id="m-fl02-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-03 — Produtos</td>
+          <td>6</td>
+          <td id="m-fl03-p">—</td>
+          <td id="m-fl03-f">—</td>
+          <td id="m-fl03-b">—</td>
+          <td id="m-fl03-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-04 — Categorias</td>
+          <td>3</td>
+          <td id="m-fl04-p">—</td>
+          <td id="m-fl04-f">—</td>
+          <td id="m-fl04-b">—</td>
+          <td id="m-fl04-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-05 — Pedidos</td>
+          <td>5</td>
+          <td id="m-fl05-p">—</td>
+          <td id="m-fl05-f">—</td>
+          <td id="m-fl05-b">—</td>
+          <td id="m-fl05-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-06 — Clientes e Realitos</td>
+          <td>4</td>
+          <td id="m-fl06-p">—</td>
+          <td id="m-fl06-f">—</td>
+          <td id="m-fl06-b">—</td>
+          <td id="m-fl06-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-07 — Banners</td>
+          <td>3</td>
+          <td id="m-fl07-p">—</td>
+          <td id="m-fl07-f">—</td>
+          <td id="m-fl07-b">—</td>
+          <td id="m-fl07-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-08 — Cupons</td>
+          <td>3</td>
+          <td id="m-fl08-p">—</td>
+          <td id="m-fl08-f">—</td>
+          <td id="m-fl08-b">—</td>
+          <td id="m-fl08-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-09 — Configurações de Entrega</td>
+          <td>3</td>
+          <td id="m-fl09-p">—</td>
+          <td id="m-fl09-f">—</td>
+          <td id="m-fl09-b">—</td>
+          <td id="m-fl09-pct">—</td>
+        </tr>
+        <tr>
+          <td>FL-10 — Sistema Realitos</td>
+          <td>2</td>
+          <td id="m-fl10-p">—</td>
+          <td id="m-fl10-f">—</td>
+          <td id="m-fl10-b">—</td>
+          <td id="m-fl10-pct">—</td>
+        </tr>
+        <tr style="font-weight:700; background:rgba(108,99,255,.06);">
+          <td>TOTAL</td>
+          <td id="mat-total">—</td>
+          <td id="mat-pass">—</td>
+          <td id="mat-fail">—</td>
+          <td id="mat-block">—</td>
+          <td id="mat-pct">—</td>
+        </tr>
+      </tbody>
+    </table>
+
+  </main>
+
+  <footer class="footer">
+    Gerado pela equipe de QA — <strong>ByStartup</strong> · POP-QA-001 v1.0 &nbsp;·&nbsp; Projeto: Mundo Real Admin
+  </footer>
+
+  <script>
+    // ── DADOS DOS TESTES (atualizar após execução) ──────────────
+    const testData = {
+      fl01: { total: 4, pass: 4, fail: 0, block: 0 },
+      fl02: { total: 3, pass: 3, fail: 0, block: 0 },
+      fl03: { total: 6, pass: 6, fail: 0, block: 0 },
+      fl04: { total: 3, pass: 3, fail: 0, block: 0 },
+      fl05: { total: 5, pass: 4, fail: 1, block: 0 },
+      fl06: { total: 4, pass: 3, fail: 1, block: 0 },
+      fl07: { total: 3, pass: 3, fail: 0, block: 0 },
+      fl08: { total: 3, pass: 3, fail: 0, block: 0 },
+      fl09: { total: 3, pass: 3, fail: 0, block: 0 },
+      fl10: { total: 2, pass: 2, fail: 0, block: 0 },
+    };
+
+    // ── SCOREBOARD ─────────────────────────────────────────────
+    function initScoreboard() {
+      let totalAll = 0, passAll = 0, failAll = 0, blockAll = 0;
+
+      Object.keys(testData).forEach(key => {
+        const d = testData[key];
+        totalAll += d.total;
+        passAll += d.pass;
+        failAll += d.fail;
+        blockAll += d.block;
+
+        const pct = d.pass > 0 ? Math.round((d.pass / d.total) * 100) + '%' : '—';
+        const el = (id) => document.getElementById(id);
+        if (el(`m-${key}-p`)) el(`m-${key}-p`).textContent = d.pass;
+        if (el(`m-${key}-f`)) el(`m-${key}-f`).textContent = d.fail;
+        if (el(`m-${key}-b`)) el(`m-${key}-b`).textContent = d.block;
+        if (el(`m-${key}-pct`)) el(`m-${key}-pct`).textContent = pct;
+      });
+
+      document.getElementById('sc-total').textContent = totalAll;
+      document.getElementById('sc-pass').textContent = passAll;
+      document.getElementById('sc-fail').textContent = failAll;
+      document.getElementById('sc-block').textContent = blockAll;
+
+      const pct = passAll > 0 ? Math.round((passAll / totalAll) * 100) : 0;
+      document.getElementById('sc-pct').textContent = passAll > 0 ? pct + '%' : '—';
+
+      const bar = document.getElementById('progress-bar');
+      bar.style.width = pct + '%';
+      document.getElementById('progress-pct-label').textContent = pct + '%';
+
+      document.getElementById('mat-total').textContent = totalAll;
+      document.getElementById('mat-pass').textContent = passAll;
+      document.getElementById('mat-fail').textContent = failAll;
+      document.getElementById('mat-block').textContent = blockAll;
+      document.getElementById('mat-pct').textContent = passAll > 0 ? pct + '%' : '—';
+    }
+
+    // ── ACORDEÃO ───────────────────────────────────────────────
+    function toggleFlow(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle('open');
+    }
+
+    // ── LIGHTBOX ───────────────────────────────────────────────
+    function openLightbox(src) {
+      document.getElementById('lightbox-img').src = src;
+      document.getElementById('lightbox').classList.add('open');
+    }
+    function closeLightbox() {
+      document.getElementById('lightbox').classList.remove('open');
+      document.getElementById('lightbox-img').src = '';
+    }
+    document.getElementById('lightbox').addEventListener('click', function (e) {
+      if (e.target === this) closeLightbox();
+    });
+    document.addEventListener('keydown', function (e) {
+      if (e.key === 'Escape') closeLightbox();
+    });
+
+    // ── INIT ───────────────────────────────────────────────────
+    document.addEventListener('DOMContentLoaded', function () {
+      document.getElementById('meta-executor').textContent = 'Equipe QA — ByStartup';
+      document.getElementById('meta-data').textContent = new Date().toLocaleDateString('pt-BR', {
+        day: '2-digit', month: '2-digit', year: 'numeric'
+      });
+      initScoreboard();
+    });
+  </script>
+</body>
+
+</html>

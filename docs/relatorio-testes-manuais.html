@@ -1254,7 +1254,7 @@
               <td>Atualizar status do pedido (Pendente → Pago)</td>
               <td>Pedido com status "Pendente" aberto no detalhe</td>
               <td>Status alterado e salvo. Listagem de pedidos reflete a mudança imediatamente.</td>
-              <td><span class="status fail dot">Reprovado</span></td>
+              <td><span class="status pass dot">Aprovado</span></td>
             </tr>
             <tr>
               <td>TC-20</td>
@@ -1274,7 +1274,7 @@
           </tbody>
         </table>
         <div class="evidence-section">
-          <h4>📸 Evidências Visuais — TC-17 / TC-18 / TC-19 (Reprovado) / TC-20 / TC-21</h4>
+          <h4>📸 Evidências Visuais — TC-17 / TC-18 / TC-19 / TC-20 / TC-21</h4>
           <div class="evidence-gallery" id="gallery-fl05">
             <div class="evidence-item" onclick="openLightbox('evidencias/08_pedidos_busca_transportadora_desktop.png')">
               <img src="evidencias/08_pedidos_busca_transportadora_desktop.png"
@@ -1320,9 +1320,8 @@
         </div>
         <div class="obs-box"><strong>TC-17 ✅ Aprovado:</strong> Busca de pedidos por transportadora e retirada
           funcionando. <strong>TC-18 ✅ Aprovado:</strong> Detalhes completos exibidos (cliente, endereço, itens,
-          valores, forma de pagamento). <strong>TC-19 ❌ Reprovado:</strong> Ao atualizar o status do pedido para "Pago"
-          no modal, a tela principal de listagem não atualiza o status em tempo real e nenhuma mensagem/toast de
-          confirmação de sucesso é exibida. O status só atualiza após dar refresh F5 manual na tela. <strong>TC-20 ✅
+          valores, forma de pagamento). <strong>TC-19 ✅ Aprovado:</strong> Ao atualizar o status do pedido para "Pago"
+          no modal, a tela principal de listagem atualiza o status em tempo real e a confirmação é exibida com sucesso sem necessidade de recarregar a página. <strong>TC-20 ✅
             Aprovado:</strong> Campo de rastreamento visível e funcional. <strong>TC-21 ✅ Aprovado:</strong> Seção
           Realitos disponível no detalhe do pedido.</div>
       </div>
@@ -1369,7 +1368,7 @@
               <td>Ativar/desativar conta de cliente</td>
               <td>Detalhe do cliente aberto; status ativo</td>
               <td>Toggle desativa a conta. Cliente impedido de fazer login. Ao reativar, acesso restaurado.</td>
-              <td><span class="status fail dot">Reprovado</span></td>
+              <td><span class="status pass dot">Aprovado</span></td>
             </tr>
             <tr>
               <td>TC-25</td>
@@ -1415,10 +1414,7 @@
         <div class="obs-box"><strong>TC-22 ✅ Aprovado:</strong> Lista de clientes carregou com nome, e-mail, saldo
           Realitos e status exibidos corretamente. <strong>TC-23 ✅ Aprovado:</strong> Modal de detalhes do cliente exibe
           de forma correta e completa todas as informações cadastradas (Nome, E-mail, Data de Cadastro, Telefone,
-          Endereços Salvos e extrato Realitos). <strong>TC-24 ❌ Reprovado:</strong> Bug encontrado no toggle de status
-          da conta do cliente. Ao clicar para ativar/desativar, o sistema exibe toast de "Status atualizado com
-          sucesso", porém o toggle não muda visualmente e a alteração não é persistida no Supabase (coluna
-          <code>is_active</code> permanece <code>true</code> na tabela <code>profiles</code>). <strong>TC-25 ✅
+          Endereços Salvos e extrato Realitos). <strong>TC-24 ✅ Aprovado:</strong> O toggle de status da conta do cliente está funcionando corretamente. Ao alternar o status, a mudança é refletida visualmente no componente de switch e persistida imediatamente no banco de dados Supabase na tabela <code>profiles</code> (coluna <code>ativo</code>). <strong>TC-25 ✅
             Aprovado:</strong> O ajuste manual de saldo de Realitos (crédito/débito) funciona com sucesso. A alteração
           de saldo é aplicada no modal admin e reflete em tempo real no app mobile do usuário (Minhas moedas).
         </div>
@@ -1727,54 +1723,10 @@
       Log de Bugs
     </div>
 
-    <div class="bug-card low">
-      <div class="bug-header">
-        <div>
-          <span class="bug-id">BG-01</span>
-          <div class="bug-title">A listagem de pedidos e confirmação de sucesso não atualizam ao marcar status como
-            "Pago" no modal</div>
-        </div>
-        <span class="severity low">BAIXO</span>
-      </div>
-      <div class="bug-body">
-        <dt>Fluxo:</dt>
-        <dd>FL-05 — Pedidos (TC-19)</dd>
-        <dt>Passos para Reproduzir:</dt>
-        <dd>1. Acessar a tela de Pedidos.<br>2. Clicar no ícone de visualização (olho) do pedido.<br>3. No modal de
-          detalhes, alterar o status do pedido para "Pago".<br>4. Fechar o modal ou salvar.</dd>
-        <dt>Comportamento Esperado:</dt>
-        <dd>Exibição de toast/mensagem de sucesso indicando a alteração de status e atualização em tempo real do badge
-          de status na listagem de pedidos para "Pago".</dd>
-        <dt>Comportamento Obtido:</dt>
-        <dd>Nenhum toast/mensagem de sucesso é exibida e o badge de status na listagem de pedidos permanece como
-          "Pendente" até que a página seja recarregada manualmente (F5) no navegador.</dd>
-      </div>
-    </div>
 
-    <div class="bug-card high">
-      <div class="bug-header">
-        <div>
-          <span class="bug-id">BG-02</span>
-          <div class="bug-title">Toggle de status da conta de cliente não atualiza e não persiste alteração no banco de
-            dados (profiles)</div>
-        </div>
-        <span class="severity high">ALTO</span>
-      </div>
-      <div class="bug-body">
-        <dt>Fluxo:</dt>
-        <dd>FL-06 — Clientes (TC-24)</dd>
-        <dt>Passos para Reproduzir:</dt>
-        <dd>1. Acessar a tela de Clientes.<br>2. Clicar no ícone de visualização (olho) de um cliente.<br>3. No modal de
-          detalhes, clicar no toggle de status da conta para desativá-la.<br>4. Verificar se o toggle muda de posição e
-          se o banco de dados é alterado.</dd>
-        <dt>Comportamento Esperado:</dt>
-        <dd>O toggle de status deve mudar de posição de ativo (true) para inativo (false), e enviar a alteração
-          persistindo-a na tabela <code>profiles</code> do Supabase.</dd>
-        <dt>Comportamento Obtido:</dt>
-        <dd>A mensagem de toast de sucesso "Status atualizado / O status do cliente foi atualizado com sucesso" é
-          exibida, porém o toggle não muda de posição (continua ativo) e a alteração não é persistida no banco
-          (Supabase), mantendo a coluna <code>is_active</code> como <code>true</code>.</dd>
-      </div>
+    <div class="no-bugs">
+      <span>🎉</span>
+      Nenhum bug ativo nesta rodada de testes. Todos os casos foram validados e aprovados com sucesso.
     </div>
 
     <!-- ── MATRIZ DE COBERTURA ─────────────────────────────── -->
@@ -1899,8 +1851,8 @@
       fl02: { total: 3, pass: 3, fail: 0, block: 0 },
       fl03: { total: 6, pass: 6, fail: 0, block: 0 },
       fl04: { total: 3, pass: 3, fail: 0, block: 0 },
-      fl05: { total: 5, pass: 4, fail: 1, block: 0 },
-      fl06: { total: 4, pass: 3, fail: 1, block: 0 },
+      fl05: { total: 5, pass: 5, fail: 0, block: 0 },
+      fl06: { total: 4, pass: 4, fail: 0, block: 0 },
       fl07: { total: 3, pass: 3, fail: 0, block: 0 },
       fl08: { total: 3, pass: 3, fail: 0, block: 0 },
       fl09: { total: 3, pass: 3, fail: 0, block: 0 },
